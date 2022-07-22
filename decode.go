@@ -31,18 +31,18 @@ func readBuf(reader io.Reader) ([]byte, error) {
 		quit := false
 		switch {
 		case err == io.EOF:
-			//log.Printf("->err == io.EOF")
+			// log.Printf("->err == io.EOF")
 			superBuf = append(superBuf, buf...)
 			quit = true
 		case n < bufCap:
-			//log.Printf("->n < bufCap")
+			// log.Printf("->n < bufCap")
 			superBuf = append(superBuf, buf...)
-			//quit = true
+			// quit = true
 		case err != nil:
-			//log.Printf("->err != nil")
+			// log.Printf("->err != nil")
 			superBuf = nil
 		default:
-			//log.Printf("->default")
+			// log.Printf("->default")
 			superBuf = append(superBuf, buf...)
 		}
 		if quit {

@@ -1,87 +1,54 @@
 package golevel7
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+)
 
 func TestFind(t *testing.T) {
-
 	data, err := readFile("./testdata/msg3.hl7")
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
+
 	msg := &Message{Value: []rune(string(data))}
-	msg.parse()
-	if err != nil {
-		t.Fatal(err)
-	}
+	err = msg.parse()
+	require.NoError(t, err)
 
 	val, err := msg.Find("OBR.4.3")
-	if err != nil {
-		t.Error(err)
-	}
-	if val != "CPT-4" {
-		t.Errorf("Expected CPT-4 got %s\n", val)
-	}
+	assert.NoError(t, err)
+	assert.Equal(t, "CPT-4", val)
 
 	val, err = msg.Find("OBX.3.3")
-	if err != nil {
-		t.Error(err)
-	}
-	if val != "LOINC" {
-		t.Errorf("Expected LOINC got %s\n", val)
-	}
+	assert.NoError(t, err)
+	assert.Equal(t, "LOINC", val)
 }
 
 func TestFindAll(t *testing.T) {
-
 	data, err := readFile("./testdata/msg3.hl7")
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	msg := &Message{Value: []rune(string(data))}
 	msg.parse()
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	vals, err := msg.FindAll("OBX.1")
-	if err != nil {
-		t.Error(err)
-	}
+	assert.NoError(t, err)
 
-	if len(vals) != 4 {
-		t.Fatalf("Expected 4 got %d\n", len(vals))
-	}
-
-	if vals[0] != "1" {
-		t.Errorf("Expected 1 got %s\n", vals[0])
-	}
-	if vals[1] != "2" {
-		t.Errorf("Expected 2 got %s\n", vals[1])
-	}
-	if vals[2] != "3" {
-		t.Errorf("Expected 3 got %s\n", vals[2])
-	}
-	if vals[3] != "4" {
-		t.Errorf("Expected 4 got %s\n", vals[3])
-	}
+	assert.Len(t, vals, 4)
+	assert.Equal(t, "1", vals[0])
+	assert.Equal(t, "2", vals[1])
+	assert.Equal(t, "3", vals[2])
+	assert.Equal(t, "4", vals[3])
 }
 
 func TestRepFields(t *testing.T) {
 	data, err := readFile("./testdata/msg.hl7")
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	msg := &Message{Value: []rune(string(data))}
 	msg.parse()
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	vals, err := msg.FindAll("PID.11.3")
-	if err != nil {
-		t.Error(err)
-	}
-	if len(vals) != 2 {
-		t.Errorf("Expected 2 got %d\n", len(vals))
-	}
+	assert.NoError(t, err)
+	assert.Len(t, vals, 2)
 }

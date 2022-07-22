@@ -1,8 +1,9 @@
-# Go Level 7 [![GoDoc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat-square)](https://godoc.org/github.com/dshills/golevel7)
+# Go Level 7 [![GoDoc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat-square)](https://godoc.org/github.com/donnypb/golevel7)
 
 ## Overview
 
 	Go Level 7 is a decoder / encoder for HL7.
+> 	Forked from [github.com/dshills/golevel7](github.com/dshills/golevel7)
 > 	Health Level-7 or HL7 refers to a set of international standards for transfer of clinical and administrative data between software applications used by various healthcare providers. These standards focus on the application layer, which is "layer 7" in the OSI model. -Wikipedia
 
 ## Features
@@ -16,7 +17,7 @@
 Note: Message building is not currently working for MSH segments. Coming soon...
 
 ## Installation
-	go get github.com/dshills/golevel7
+	go get github.com/donnypb/golevel7
 
 ## Usage
 

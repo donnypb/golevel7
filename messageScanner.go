@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"io"
 
-	"github.com/mhald/golevel7/commons"
+	"github.com/donnypb/golevel7/commons"
 )
 
 type MessageScanner struct {

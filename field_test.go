@@ -1,15 +1,21 @@
 package golevel7
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+)
 
 func TestFieldParse(t *testing.T) {
 	val := []rune("520 51st Street^^Denver^CO^80020^USA")
 	seps := NewDelimeters()
 	fld := &Field{Value: val}
-	fld.parse(seps)
-	if len(fld.Components) != 6 {
-		t.Errorf("Expected 6 components got %d\n", len(fld.Components))
-	}
+
+	err := fld.parse(seps)
+	require.NoError(t, err)
+
+	assert.Len(t, fld.Components, 6)
 }
 
 func TestFieldSet(t *testing.T) {
@@ -17,14 +23,10 @@ func TestFieldSet(t *testing.T) {
 	fld := &Field{}
 	loc := "ZZZ.1.10"
 	l := NewLocation(loc)
+
 	err := fld.Set(l, "TEST", seps)
-	if err != nil {
-		t.Error(err)
-	}
-	if len(fld.Components) != 11 {
-		t.Fatalf("Expected 11 got %d\n", len(fld.Components))
-	}
-	if string(fld.Components[10].SubComponents[0].Value) != "TEST" {
-		t.Errorf("Expected TEST got %s\n", string(fld.Components[10].SubComponents[0].Value))
-	}
+	require.NoError(t, err)
+
+	require.Len(t, fld.Components, 11)
+	assert.Equal(t, "TEST", string(fld.Components[10].SubComponents[0].Value))
 }

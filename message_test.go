@@ -1,10 +1,13 @@
 package golevel7
 
 import (
-	"golang.org/x/net/html/charset"
 	"io/ioutil"
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"golang.org/x/net/html/charset"
 )
 
 func readFile(fname string) ([]byte, error) {
@@ -29,78 +32,51 @@ func readFile(fname string) ([]byte, error) {
 
 func TestMessage(t *testing.T) {
 	data, err := readFile("./testdata/msg.hl7")
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	msg := &Message{Value: []rune(string(data))}
-	msg.parse()
-	if err != nil {
-		t.Error(err)
-	}
-	if len(msg.Segments) != 5 {
-		t.Errorf("Expected 5 segments got %d\n", len(msg.Segments))
-	}
+	err = msg.parse()
+	require.NoError(t, err)
+	assert.Len(t, msg.Segments, 5)
 
 	data, err = readFile("./testdata/msg2.hl7")
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
+
 	msg = &Message{Value: []rune(string(data))}
-	msg.parse()
-	if err != nil {
-		t.Error(err)
-	}
-	if len(msg.Segments) != 5 {
-		t.Errorf("Expected 5 segments got %d\n", len(msg.Segments))
-	}
+	err = msg.parse()
+	require.NoError(t, err)
+	assert.Len(t, msg.Segments, 5)
 
 	data, err = readFile("./testdata/msg3.hl7")
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
+
 	msg = &Message{Value: []rune(string(data))}
-	msg.parse()
-	if err != nil {
-		t.Error(err)
-	}
-	if len(msg.Segments) != 9 {
-		t.Errorf("Expected 9 segments got %d\n", len(msg.Segments))
-	}
+	err = msg.parse()
+	require.NoError(t, err)
+	assert.Len(t, msg.Segments, 9)
 
 	data, err = readFile("./testdata/msg4.hl7")
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
+
 	msg = &Message{Value: []rune(string(data))}
-	msg.parse()
-	if err != nil {
-		t.Error(err)
-	}
-	if len(msg.Segments) != 9 {
-		t.Errorf("Expected 9 segments got %d\n", len(msg.Segments))
-	}
+	err = msg.parse()
+	require.NoError(t, err)
+	assert.Len(t, msg.Segments, 9)
 }
 
 func TestMsgUnmarshal(t *testing.T) {
 	fname := "./testdata/msg.hl7"
 	file, err := os.Open(fname)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	defer file.Close()
 
 	msgs, err := NewDecoder(file).Messages()
-	if err != nil {
-		t.Fatal(err)
-	}
-	st := my7{}
-	msgs[0].Unmarshal(&st)
+	require.NoError(t, err)
 
-	if st.FirstName != "John" {
-		t.Errorf("Expected John got %s\n", st.FirstName)
-	}
-	if st.LastName != "Jones" {
-		t.Errorf("Expected Jones got %s\n", st.LastName)
-	}
+	st := my7{}
+	err = msgs[0].Unmarshal(&st)
+	require.NoError(t, err)
+
+	assert.Equal(t, "John", st.FirstName)
+	assert.Equal(t, "Jones", st.LastName)
 }

@@ -3,34 +3,23 @@ package golevel7
 import (
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestValid(t *testing.T) {
-
 	fname := "./testdata/msg.hl7"
 	file, err := os.Open(fname)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
+
 	defer file.Close()
 	msgs, err := NewDecoder(file).Messages()
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	valid, failures := msgs[0].IsValid(NewValidMSH24())
-	if valid == false {
-		t.Error("Expected valid MSH got invalid. Failures:")
-		for i, f := range failures {
-			t.Errorf("%d %+v\n", i, f)
-		}
-	}
+	assert.Truef(t, valid, "failures: %+v", failures)
 
 	valid, failures = msgs[0].IsValid(NewValidPID24())
-	if valid == false {
-		t.Error("Expected valid PID got invalid. Failures:")
-		for i, f := range failures {
-			t.Errorf("%d %+v\n", i, f)
-		}
-	}
+	assert.Truef(t, valid, "failures: %+v", failures)
 }

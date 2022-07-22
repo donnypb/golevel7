@@ -1,9 +1,13 @@
 package golevel7
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+)
 
 func TestBuildMessage(t *testing.T) {
-
 	mi := MsgInfo{
 		SendingApp:        "BettrLife",
 		SendingFacility:   "UnivIa",
@@ -12,72 +16,43 @@ func TestBuildMessage(t *testing.T) {
 		MessageType:       "ORM^001",
 	}
 	msg, err := StartMessage(mi)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
+
 	v, err := msg.Find("MSH.3")
-	if err != nil {
-		t.Error(err)
-	}
-	if v != "BettrLife" {
-		t.Errorf("Expected BettrLife got %s\n", v)
-	}
+	assert.NoError(t, err)
+	assert.Equal(t, "BettrLife", v)
+
 	v, err = msg.Find("MSH.4")
-	if err != nil {
-		t.Error(err)
-	}
-	if v != "UnivIa" {
-		t.Errorf("Expected UnivIa got %s\n", v)
-	}
+	assert.NoError(t, err)
+	assert.Equal(t, "UnivIa", v)
+
 	v, err = msg.Find("MSH.5")
-	if err != nil {
-		t.Error(err)
-	}
-	if v != "Epic" {
-		t.Errorf("Expected Epic got %s\n", v)
-	}
+	assert.NoError(t, err)
+	assert.Equal(t, "Epic", v)
+
 	v, err = msg.Find("MSH.6")
-	if err != nil {
-		t.Error(err)
-	}
-	if v != "UnivIa" {
-		t.Errorf("Expected UnivIa got %s\n", v)
-	}
+	assert.NoError(t, err)
+	assert.Equal(t, "UnivIa", v)
+
 	v, err = msg.Find("MSH.9")
-	if err != nil {
-		t.Error(err)
-	}
-	if v != "ORM^001" {
-		t.Errorf("Expected ORM^001 got %s\n", v)
-	}
+	assert.NoError(t, err)
+	assert.Equal(t, "ORM^001", v)
+
 	v, err = msg.Find("MSH.7")
-	if err != nil {
-		t.Error(err)
-	}
-	if v == "" {
-		t.Error("Expected value got none")
-	}
+	assert.NoError(t, err)
+	assert.NotEmpty(t, v)
+
 	v, err = msg.Find("MSH.10")
-	if err != nil {
-		t.Error(err)
-	}
-	if v == "" {
-		t.Error("Expected value got none")
-	}
+	assert.NoError(t, err)
+	assert.NotEmpty(t, v)
+
 	v, err = msg.Find("MSH.11")
-	if err != nil {
-		t.Error(err)
-	}
-	if v != "P" {
-		t.Errorf("Expected P got %s\n", v)
-	}
+	assert.NoError(t, err)
+	assert.Equal(t, "P", v)
+
 	v, err = msg.Find("MSH.12")
-	if err != nil {
-		t.Error(err)
-	}
-	if v != "2.4" {
-		t.Errorf("Expected 2.4 got %s\n", v)
-	}
+	assert.NoError(t, err)
+	assert.Equal(t, "2.4", v)
 }
 
 type aMsg struct {
@@ -94,12 +69,9 @@ func TestMessageBuilding(t *testing.T) {
 		MessageType:       "ORM^001",
 	}
 	msg, err := StartMessage(mi)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
+
 	am := aMsg{FirstName: "Davin", LastName: "Hills"}
 	_, err = Marshal(msg, &am)
-	if err != nil {
-		t.Error(err)
-	}
+	assert.NoError(t, err)
 }

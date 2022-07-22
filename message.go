@@ -116,7 +116,7 @@ func (m *Message) findObjects(loc string) ([]ValueGetter, error) {
 }
 
 type ValueGetter interface {
-    Get(loc *Location) (string, error)
+	Get(loc *Location) (string, error)
 	GetAll(loc *Location) ([]string, error)
 }
 
@@ -226,7 +226,7 @@ func (m *Message) parse() error {
 		ii++
 		switch {
 		case ch == eof || (ch == endMsg && m.Delimeters.LFTermMsg):
-			//just for safety: cannot reproduce this on windows
+			// just for safety: cannot reproduce this on windows
 			safeii := map[bool]int{true: len(m.Value), false: ii}[ii > len(m.Value)]
 			v := m.Value[i:safeii]
 			if len(v) > 4 { // seg name + field sep
@@ -441,9 +441,8 @@ func (m *Message) FieldStringToComponents(val string) []Component {
 	for idx := range parts {
 		ret = append(ret, Component{
 			SubComponents: nil,
-			Value: []rune(parts[idx]),
+			Value:         []rune(parts[idx]),
 		})
-		fmt.Printf("setting field %i to %s\n", idx, parts[idx])
 	}
 	return ret
 }
@@ -464,7 +463,7 @@ func (s Segment) Unmarshal(it interface{}) error {
 			if val, _ := s.Find(r); val != "" {
 				if st.Field(i).CanSet() {
 					// TODO support fields other than string
-					//fldT := st.Field(i).Type()
+					// fldT := st.Field(i).Type()
 					st.Field(i).SetString(strings.TrimSpace(val))
 				}
 			}
