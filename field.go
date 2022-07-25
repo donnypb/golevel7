@@ -47,7 +47,7 @@ func (f *Field) parse(seps *Delimeters) error {
 		ch, _, _ := r.ReadRune()
 		ii++
 		switch {
-		case ch == eof || (ch == endMsg && seps.LFTermMsg):
+		case ch == eof:
 			if ii > i {
 				cmp := Component{Value: f.Value[i : ii-1]}
 				cmp.parse(seps)

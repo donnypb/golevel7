@@ -1,8 +1,10 @@
 package golevel7
 
-const eof = rune(0)
-const endMsg = '\x0A'
-const segTerm = '\x0D'
+const (
+	eof = rune(0)
+	LF  = '\x0A'
+	CR  = '\x0D'
+)
 
 // Delimeters holds the list of hl7 message delimeters
 type Delimeters struct {
@@ -13,7 +15,6 @@ type Delimeters struct {
 	Escape         rune
 	SubComponent   rune
 	Truncate       rune
-	LFTermMsg      bool
 }
 
 // NewDelimeters returns the default set of HL7 delimeters

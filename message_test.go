@@ -39,6 +39,22 @@ func TestMessage(t *testing.T) {
 	require.NoError(t, err)
 	assert.Len(t, msg.Segments, 5)
 
+	data, err = readFile("./testdata/msg.lf.hl7")
+	require.NoError(t, err)
+
+	msg = &Message{Value: []rune(string(data))}
+	err = msg.parse()
+	require.NoError(t, err)
+	assert.Len(t, msg.Segments, 5)
+
+	data, err = readFile("./testdata/msg.crlf.hl7")
+	require.NoError(t, err)
+
+	msg = &Message{Value: []rune(string(data))}
+	err = msg.parse()
+	require.NoError(t, err)
+	assert.Len(t, msg.Segments, 5)
+
 	data, err = readFile("./testdata/msg2.hl7")
 	require.NoError(t, err)
 

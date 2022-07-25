@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-//Component is an HL7 component
+// Component is an HL7 component
 type Component struct {
 	SubComponents []SubComponent
 	Value         []rune
@@ -35,7 +35,7 @@ func (c *Component) parse(seps *Delimeters) error {
 		ch, _, _ := r.ReadRune()
 		ii++
 		switch {
-		case ch == eof || (ch == endMsg && seps.LFTermMsg):
+		case ch == eof:
 			if ii > i {
 				scmp := SubComponent{Value: c.Value[i : ii-1]}
 				c.SubComponents = append(c.SubComponents, scmp)

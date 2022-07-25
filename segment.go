@@ -64,7 +64,7 @@ func (s *Segment) parse(seps *Delimeters) error {
 		ch, _, _ := r.ReadRune()
 		ii++
 		switch {
-		case ch == eof || (ch == endMsg && seps.LFTermMsg):
+		case ch == eof:
 			if ii > i {
 				fld := Field{Value: s.Value[i : ii-1], SeqNum: seq, SegName: segName}
 				fld.parse(seps)

@@ -225,7 +225,7 @@ func (m *Message) parse() error {
 		}
 		ii++
 		switch {
-		case ch == eof || (ch == endMsg && m.Delimeters.LFTermMsg):
+		case ch == eof:
 			// just for safety: cannot reproduce this on windows
 			safeii := map[bool]int{true: len(m.Value), false: ii}[ii > len(m.Value)]
 			v := m.Value[i:safeii]
@@ -235,7 +235,11 @@ func (m *Message) parse() error {
 				m.Segments = append(m.Segments, seg)
 			}
 			return nil
-		case ch == segTerm:
+		case ch == CR || ch == LF:
+			if m.Value[ii] == LF {
+				ii++
+				r.ReadRune()
+			}
 			seg := Segment{Value: m.Value[i : ii-1]}
 			seg.parse(&m.Delimeters)
 			m.Segments = append(m.Segments, seg)
@@ -286,7 +290,7 @@ func (m *Message) encode() []rune {
 	for _, s := range m.Segments {
 		buf = append(buf, []byte(string(s.Value)))
 	}
-	return []rune(string(bytes.Join(buf, []byte(string(segTerm)))))
+	return []rune(string(bytes.Join(buf, []byte(string(CR)))))
 }
 
 // IsValid checks a message for validity based on a set of criteria
