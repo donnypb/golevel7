@@ -8,11 +8,16 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+type Address struct {
+	Street string `hl7:"PID.11.1"`
+	City   string `hl7:"PID.11.3"`
+}
+
 type my7 struct {
-	FirstName        string   `hl7:"PID.5.2"`
-	LastName         string   `hl7:"PID.5.1"`
-	PatientAddresses []string `hl7:"PID.11"`
-	Countries        []string `hl7:"PID.11.6"`
+	FirstName        string    `hl7:"PID.5.2"`
+	LastName         string    `hl7:"PID.5.1"`
+	PatientAddresses []Address `hl7:"PID.11"`
+	Countries        []string  `hl7:"PID.11.6"`
 }
 
 func TestDecode(t *testing.T) {
@@ -33,8 +38,10 @@ func TestDecode(t *testing.T) {
 	assert.Equal(t, "Jones", st.LastName)
 
 	assert.Len(t, st.PatientAddresses, 2)
-	assert.Equal(t, "123 West St.^^Denver^CO^80020^USA", st.PatientAddresses[0])
-	assert.Equal(t, "520 51st Street^^Denver^CO^80020^USA", st.PatientAddresses[1])
+	assert.Equal(t, "123 West St.", st.PatientAddresses[0].Street)
+	assert.Equal(t, "Denver", st.PatientAddresses[0].City)
+	assert.Equal(t, "520 51st Street", st.PatientAddresses[1].Street)
+	assert.Equal(t, "Denver", st.PatientAddresses[1].City)
 
 	assert.Len(t, st.Countries, 2)
 	assert.Equal(t, "USA", st.Countries[0])
