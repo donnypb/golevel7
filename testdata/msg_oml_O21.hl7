@@ -1,0 +1,10 @@
+MSH|^~\&|Sourcelab|Sourcefacility|Destinationlab|Destinationfacility|20201119173249||OML^021^OML_021|131358|P|2.5|||AL|ER
+PID|1|MRN/Identification|HospitalHistoryNumber^^^HIS^PN^^^||DoctorCode/description|Fieldname|DOB|Gender|||^^^^^|||||||||||||||||||NewPatient
+PV1|1|I|^^|HospitalDepartment|||HospitalDepartmentCode^^HospitalDepartmentUser|||H60|||||||||HospitalRequestNumber^^^|||||||||||||||||||||||||HospitalRequestDate
+GT1|1
+ORC|NW|2021P0067674|6001|0|||||20210626001003||||H60||||^2021P0067674
+OBR|1|41510399|6001|A000172^|||20210626001003|20210626001003|||||||||||||||||F
+OBX|1|ST|A000172^^||34|UI/L|30-118|N|||F
+ORC|NW|2021P0067674|6001|0|||||20210626001003||||H60||||^2021P0067674
+OBR|1|41510399|6001|A001312^|||20210626001003|20210626001003|||||||||||||||||F
+OBX|1|ST|A001312^^||238|UI/L|208-378|N|||F

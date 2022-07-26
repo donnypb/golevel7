@@ -74,6 +74,59 @@ func TestDecode(t *testing.T) {
 	assert.Equal(t, "", st.MessageType.MessageStructure)
 }
 
+type ORC struct {
+	OrderControl      string `hl7:"ORC.1"`
+	PlacerOrderNumber string `hl7:"ORC.2"`
+	OrderStatus       string `hl7:"ORC.5"`
+}
+
+type OBR struct {
+	SetID              string `hl7:"OBR.1"`
+	PlacerOrderNumber  string `hl7:"OBR.2"`
+	UniversalServiceID string `hl7:"OBR.4.1"`
+}
+
+type OBX struct {
+	SetID            string `hl7:"OBX.1"`
+	Type             string `hl7:"OBX.2"`
+	ObservationID    string `hl7:"OBX.3.1"`
+	ObeservationText string `hl7:"OBX.3.2"`
+	ObservationValue string `hl7:"OBX.5.1"`
+}
+
+type OMLMsg struct {
+	ORCs []ORC `hl7:"ORC"`
+	OBRs []OBR `hl7:"OBR"`
+	OBXs []OBX `hl7:"OBX"`
+}
+
+func TestDecodeOML(t *testing.T) {
+	fname := "./testdata/msg_oml_O21.hl7"
+	file, err := os.Open(fname)
+	require.NoError(t, err)
+	defer file.Close()
+
+	st := OMLMsg{}
+	msgs, err := NewDecoder(file).Messages()
+	require.NoError(t, err)
+	require.Len(t, msgs, 1)
+
+	err = msgs[0].Unmarshal(&st)
+	require.NoError(t, err)
+
+	assert.Len(t, st.ORCs, 2)
+	assert.Equal(t, ORC{OrderControl: "NW", PlacerOrderNumber: "2021P0067674", OrderStatus: ""}, st.ORCs[0])
+	assert.Equal(t, ORC{OrderControl: "NW", PlacerOrderNumber: "2021P0067674", OrderStatus: ""}, st.ORCs[1])
+
+	assert.Len(t, st.OBRs, 2)
+	assert.Equal(t, OBR{SetID: "1", PlacerOrderNumber: "41510399", UniversalServiceID: "A000172"}, st.OBRs[0])
+	assert.Equal(t, OBR{SetID: "1", PlacerOrderNumber: "41510399", UniversalServiceID: "A001312"}, st.OBRs[1])
+
+	assert.Len(t, st.OBXs, 2)
+	assert.Equal(t, OBX{SetID: "1", Type: "ST", ObservationID: "A000172", ObeservationText: "", ObservationValue: "34"}, st.OBXs[0])
+	assert.Equal(t, OBX{SetID: "1", Type: "ST", ObservationID: "A001312", ObeservationText: "", ObservationValue: "238"}, st.OBXs[1])
+}
+
 func TestFailedDecode(t *testing.T) {
 	fname := "./testdata/msg.hl7"
 	file, err := os.Open(fname)
