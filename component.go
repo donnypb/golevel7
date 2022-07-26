@@ -77,6 +77,7 @@ func (c *Component) Get(l *Location) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	return string(sc.Value), nil
 }
 

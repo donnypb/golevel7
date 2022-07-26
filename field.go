@@ -88,9 +88,14 @@ func (f *Field) Get(l *Location) (string, error) {
 		return string(f.Value), nil
 	}
 	comp, err := f.Component(l.Comp)
+	if err != nil && err.Error() == "Component out of range" {
+		return "", nil
+	}
+
 	if err != nil {
 		return "", err
 	}
+
 	return comp.Get(l)
 }
 

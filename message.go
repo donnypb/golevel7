@@ -337,7 +337,7 @@ func (m *Message) Unmarshal(result interface{}) error {
 		return fmt.Errorf("hl7: cannot unmarshal to nil value of %q", reflect.TypeOf(result))
 	}
 
-	st := val.Elem()
+	st := reflect.Indirect(val)
 	stt := st.Type()
 	for i := 0; i < st.NumField(); i++ {
 		fld := stt.Field(i)
@@ -356,6 +356,54 @@ func (m *Message) Unmarshal(result interface{}) error {
 				st.Field(i).SetString(strings.TrimSpace(val))
 			}
 			continue
+		}
+
+		// Support field with type struct but not nesting (just this level)
+		if st.Field(i).Kind() == reflect.Struct {
+			structField := st.Field(i)
+			structFieldType := structField.Type()
+			if r != "" {
+				tagParts := strings.Split(r, ",")
+				objs, err := m.findObjects(tagParts[0])
+				if err != nil {
+					return fmt.Errorf("hl7: findObjects: %v", err)
+				}
+
+				if len(objs) == 0 {
+					continue
+				}
+
+				for internalFieldIdx := 0; internalFieldIdx < structField.NumField(); internalFieldIdx++ {
+					internalField := structFieldType.Field(internalFieldIdx)
+					internalFieldTag := internalField.Tag.Get("hl7")
+					location := strings.Split(internalFieldTag, ",")[0]
+
+					if internalField.Type.Kind() == reflect.String {
+						newVal, err := objs[0].Get(NewLocation(location))
+						if err != nil {
+							return fmt.Errorf("hl7: Get: %v", err)
+						}
+						structField.Field(internalFieldIdx).SetString(strings.TrimSpace(newVal)) // TODO: support fields other than string
+						continue
+					}
+
+					if internalField.Type.Kind() == reflect.Slice {
+						if reflect.SliceOf(internalField.Type.Elem()) == reflect.TypeOf(stringArray) {
+							vals, err := objs[0].GetAll(NewLocation(location))
+							if err != nil {
+								return err
+							}
+							stringSlice := reflect.MakeSlice(reflect.TypeOf(stringArray), len(vals), len(vals))
+							for idx := range vals {
+								stringSlice.Index(idx).Set(reflect.ValueOf(strings.TrimSpace(vals[idx])))
+							}
+							structField.Field(internalFieldIdx).Set(stringSlice)
+						}
+						continue
+					}
+				}
+			}
+
 		}
 
 		if st.Field(i).Kind() == reflect.Slice {
