@@ -79,7 +79,7 @@ func (m *Message) LastSegment(s string) (*Segment, error) {
 	return nil, fmt.Errorf("Segment not found")
 }
 
-// AllSegments returns the first matching segmane with name s
+// AllSegments returns all matching segments with name s
 func (m *Message) AllSegments(s string) ([]*Segment, error) {
 	segs := []*Segment{}
 	for i, seg := range m.Segments {
@@ -318,13 +318,21 @@ func (m *Message) IsValid(val []Validation) (bool, []Validation) {
 var stringArray []string
 
 // Unmarshal fills a structure from an HL7 message
-// It will panic if interface{} is not a pointer to a struct
 // Unmarshal will decode the entire message before trying to set values
 // it will set the first matching segment / first matching field
 // repeating segments and fields is not well suited to this
 // for the moment all unmarshal target fields must be strings
-func (m *Message) Unmarshal(it interface{}) error {
-	st := reflect.ValueOf(it).Elem()
+func (m *Message) Unmarshal(result interface{}) error {
+	val := reflect.ValueOf(result)
+	if val.Kind() != reflect.Ptr {
+		return errors.New("result must be a pointer")
+	}
+
+	st := val.Elem()
+	if !st.CanAddr() {
+		return errors.New("result must be addressable (a pointer)")
+	}
+
 	stt := st.Type()
 	for i := 0; i < st.NumField(); i++ {
 		fld := stt.Field(i)
@@ -359,9 +367,7 @@ func (m *Message) Unmarshal(it interface{}) error {
 				st.Field(i).Set(stringSlice)
 				continue
 			}
-		}
 
-		if st.Field(i).Type().Kind() == reflect.Slice {
 			// TODO: add check to ensure that the slice is a struct and not a string (which is handled above)
 			// TODO: recurse back into this function to allow arbitrary nesting of structs
 
