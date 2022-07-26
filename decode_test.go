@@ -13,11 +13,18 @@ type Address struct {
 	City   string `hl7:"PID.11.3"`
 }
 
+type MessageType struct {
+	MessageCode      string `hl7:"MSH.9.1"`
+	TriggerEvent     string `hl7:"MSH.9.2"`
+	MessageStructure string `hl7:"MSH.9.3"`
+}
+
 type my7 struct {
 	FirstName        string    `hl7:"PID.5.2"`
 	LastName         string    `hl7:"PID.5.1"`
 	PatientAddresses []Address `hl7:"PID.11"`
 	Countries        []string  `hl7:"PID.11.6"`
+	MessageType      `hl7:"MSH.9"`
 }
 
 func TestDecode(t *testing.T) {
@@ -46,4 +53,26 @@ func TestDecode(t *testing.T) {
 	assert.Len(t, st.Countries, 2)
 	assert.Equal(t, "USA", st.Countries[0])
 	assert.Equal(t, "USA", st.Countries[1])
+
+	assert.Equal(t, st.MessageType.MessageCode, "ORM")
+	assert.Equal(t, st.MessageType.TriggerEvent, "O01")
+	assert.Equal(t, st.MessageType.MessageStructure, "")
+}
+
+func TestFailedDecode(t *testing.T) {
+	fname := "./testdata/msg.hl7"
+	file, err := os.Open(fname)
+	require.NoError(t, err)
+	defer file.Close()
+
+	msgs, err := NewDecoder(file).Messages()
+	require.NoError(t, err)
+	require.Len(t, msgs, 1)
+
+	err = msgs[0].Unmarshal(nil)
+	assert.EqualError(t, err, "hl7: cannot unmarshal to non-pointer <nil>")
+
+	var st *my7
+	err = msgs[0].Unmarshal(st)
+	assert.EqualError(t, err, "hl7: cannot unmarshal to nil value of \"*golevel7.my7\"")
 }

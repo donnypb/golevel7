@@ -325,14 +325,19 @@ var stringArray []string
 func (m *Message) Unmarshal(result interface{}) error {
 	val := reflect.ValueOf(result)
 	if val.Kind() != reflect.Ptr {
-		return errors.New("result must be a pointer")
+		s := "%q"
+		if reflect.TypeOf(result) == nil {
+			s = "%v"
+		}
+
+		return fmt.Errorf("hl7: cannot unmarshal to non-pointer "+s, reflect.TypeOf(result))
+	}
+
+	if val.IsNil() {
+		return fmt.Errorf("hl7: cannot unmarshal to nil value of %q", reflect.TypeOf(result))
 	}
 
 	st := val.Elem()
-	if !st.CanAddr() {
-		return errors.New("result must be addressable (a pointer)")
-	}
-
 	stt := st.Type()
 	for i := 0; i < st.NumField(); i++ {
 		fld := stt.Field(i)
