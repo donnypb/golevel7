@@ -87,6 +87,7 @@ func (m *Message) AllSegments(s string) ([]*Segment, error) {
 		if err != nil {
 			continue
 		}
+
 		if string(fld.Value) == s {
 			segs = append(segs, &m.Segments[i])
 		}
@@ -159,10 +160,12 @@ func (m *Message) getObjects(l *Location) ([]ValueGetter, error) {
 		vals = append(vals, m)
 		return vals, nil
 	}
+
 	segs, err := m.AllSegments(l.Segment)
 	if err != nil {
 		return vals, err
 	}
+
 	for _, s := range segs {
 		vs, err := s.getObjects(l)
 		if err != nil {
@@ -365,12 +368,13 @@ func (m *Message) Unmarshal(result interface{}) error {
 			if r != "" {
 				tagParts := strings.Split(r, ",")
 				objs, err := m.findObjects(tagParts[0])
-				if err != nil {
-					return fmt.Errorf("hl7: findObjects: %v", err)
+
+				if err != nil && err.Error() == "Segment not found" {
+					continue
 				}
 
-				if len(objs) == 0 {
-					continue
+				if err != nil {
+					return fmt.Errorf("hl7: findObjects: %v", err)
 				}
 
 				for internalFieldIdx := 0; internalFieldIdx < structField.NumField(); internalFieldIdx++ {
@@ -380,9 +384,14 @@ func (m *Message) Unmarshal(result interface{}) error {
 
 					if internalField.Type.Kind() == reflect.String {
 						newVal, err := objs[0].Get(NewLocation(location))
+						if err != nil && err.Error() == "Field not found" {
+							continue
+						}
+
 						if err != nil {
 							return fmt.Errorf("hl7: Get: %v", err)
 						}
+
 						structField.Field(internalFieldIdx).SetString(strings.TrimSpace(newVal)) // TODO: support fields other than string
 						continue
 					}

@@ -26,6 +26,12 @@ type PID struct {
 	Addresses             []string `hl7:"PID.11"`
 }
 
+type GT1 struct {
+	GuarantorNumber    string `hl7:"GT1.2"`
+	GuarantorLastName  string `hl7:"GT1.3.1"`
+	GuarantorFirstName string `hl7:"GT1.3.2"`
+}
+
 type my7 struct {
 	AcceptAcknowledgmentType string    `hl7:"MSH.15"`
 	FirstName                string    `hl7:"PID.5.2"`
@@ -34,6 +40,7 @@ type my7 struct {
 	Countries                []string  `hl7:"PID.11.6"`
 	PID                      PID       `hl7:"PID"`
 	MessageType              `hl7:"MSH.9"`
+	GT1                      `hl7:"GT1"`
 }
 
 func TestDecode(t *testing.T) {
@@ -72,6 +79,8 @@ func TestDecode(t *testing.T) {
 	assert.Equal(t, "ORM", st.MessageType.MessageCode)
 	assert.Equal(t, "O01", st.MessageType.TriggerEvent)
 	assert.Equal(t, "", st.MessageType.MessageStructure)
+
+	assert.Equal(t, GT1{}, st.GT1)
 }
 
 type ORC struct {
